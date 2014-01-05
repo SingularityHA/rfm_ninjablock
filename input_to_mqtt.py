@@ -21,10 +21,13 @@ import time
 import calendar
 import json
 import codes
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)) + "/../lib")
+from config import config
 
-serialdev = '/dev/ttyO1'
-broker = "127.0.0.1"
-port = 1883
+serialdev = str(config.get("rfm_ninjablock", "serialdev"))
+broker = str(config.get("mqtt", "host"))
+port = int(config.get("mqtt", "port"))
  
 def rfm():
     print "433mhz"
