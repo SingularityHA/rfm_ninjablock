@@ -1,4 +1,4 @@
-# Singularity
+# SingularityHA
 # Copyright (C) 2014 Internet by Design Ltd
 #
 # This program is free software: you can redistribute it and/or modify
