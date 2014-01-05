@@ -97,7 +97,7 @@ def main():
 					device_id[data['DEVICE'][0]['D']]()
         	        		if data['DEVICE'][0]['D'] == 11:
 						result = codes.rfm_sensors[hex(int(data['DEVICE'][0]['DA'],2))]
-						json_data = json.dumps(["433mhz", result]) 
+						json_data = json.dumps([result]) 
 						if gap < 10:
 							if line == lastline:
 								pass
