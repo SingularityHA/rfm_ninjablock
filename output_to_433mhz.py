@@ -19,8 +19,13 @@ import serial
 from codes import rfm_actuators
 import os
 import sys
+import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)) + "/../lib")
 from config import config
+import state
+import logging
+
+logger = logging.getLogger(__name__)
 
 serialdev = str(config.get("rfm_ninjablock", "serialdev"))
 broker = str(config.get("mqtt", "host"))
@@ -34,24 +39,30 @@ def hextobin(hexval):
         return binval
 
 def on_connect(rc):
-	print "Connected 433mhz -> MQTT"
+	logger.info("Connected MQTT -> 433mhz")
 
 def on_message(msg):
 	payload = rfm_actuators[msg.payload]
+	payload_split = payload.split("_")
+	state.set(payload_split[0] + "." + payload_split[1], payload_split[2]) 
 	ser = serial.Serial(serialdev, 9600)  #open serial port
-	ser.write('{"DEVICE":[{"G":"0","V":0,"D":11,"DA":"' + hextobin(payload) + '"}]}')
-	ser.close()
+	for i in range(3):
+		ser.write('{"DEVICE":[{"G":"0","V":0,"D":11,"DA":"' + hextobin(payload) + '"}]}')
+		time.sleep(1)
+		ser.close()
 
 def main():
-	mqttc = mosquitto.Mosquitto("singularity_rfmNB_output")
+	try:
+		mqttc = mosquitto.Mosquitto("singularity_rfmNB_output")
 
-	mqttc.on_message = on_message
-	mqttc.on_connect = on_connect
+		mqttc.on_message = on_message
+		mqttc.on_connect = on_connect
 	
-	mqttc.connect(broker, port, 60, True)
+		mqttc.connect(broker, port, 60, True)
 
-	mqttc.subscribe("rfm_ninjablock/send", 2)
-
-	while mqttc.loop() == 0:
+		mqttc.subscribe("rfm_ninjablock/send", 2)
+	
+		while mqttc.loop() == 0:
+			pass
+	except KeyboardInterrupt:
 		pass
-

@@ -24,22 +24,25 @@ import codes
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)) + "/../lib")
 from config import config
+import logging
+
+logger = logging.getLogger(__name__)
 
 serialdev = str(config.get("rfm_ninjablock", "serialdev"))
 broker = str(config.get("mqtt", "host"))
 port = int(config.get("mqtt", "port"))
  
 def rfm():
-    print "433mhz"
+    logger.debug("433mhz")
 
 def humidity():
-    print "H"
+    logger.debug("H")
 
 def temperature():
-    print "T"
+    logger.debug("T")
 
 def undef():
-    print "Ignore"
+    logger.debug("Ignore")
 
 device_id = {11 : rfm,
                 30 : humidity,
@@ -49,31 +52,31 @@ device_id = {11 : rfm,
 }
 
 def on_connect(rc):
-        print "Connected"
-
-def on_connect(rc):
 	if rc == 0:
 		#rc 0 successful connect
-		print "433mhz -> MQTT Connected"
+		logger.info("433mhz -> MQTT Connected")
 	else:
 		raise Exception
  
  
 def on_publish(val):
-	print "Published 433mhz ", val
+	logger.debug("Published 433mhz")
  
 def cleanup():
-	print "Ending and cleaning up"
-	ser.close()
-	mqttc.disconnect()
+	logger.info("Ending and cleaning up")
+	try:
+		ser.close()
+		mqttc.disconnect()
+	except NameError:
+		pass
  
 def main():
 	try:
-		print "Connecting... ", serialdev
+		logger.debug("Connecting to serial port. ")
 		#connec	 to serial port
 		ser = serial.Serial(serialdev, 9600, timeout=20)
 	except:
-		print "Failed to connect serial"
+		logger.debug("Failed to connect serial")
 		#unable to continue with no serial input
 		raise SystemExit
  
@@ -95,7 +98,7 @@ def main():
 			gap = calendar.timegm(time.gmtime()) - lastpublish
 			try:
 		                data = json.loads(line)
-				print data
+				logger.debug(data)
                 		try:
 					device_id[data['DEVICE'][0]['D']]()
         	        		if data['DEVICE'][0]['D'] == 11:
@@ -107,28 +110,28 @@ def main():
 							else:
 								mqttc.publish("sensors", json_data)
 								lastpublish =  calendar.timegm(time.gmtime())
-								print hex(int(data['DEVICE'][0]['DA'],2))
+								logger.debug(hex(int(data['DEVICE'][0]['DA'],2)))
 						else:
-							print hex(int(data['DEVICE'][0]['DA'],2))
+							logger.debug(hex(int(data['DEVICE'][0]['DA'],2)))
 							mqttc.publish("sensors", json_data)
 							lastpublish =  calendar.timegm(time.gmtime())
 						lastline = line
 					else:
-						print "Other sensors - not implemented"
+						logger.info("Other sensors - not implemented")
 				except KeyError:
 					pass
 	        	except ValueError:
-        	        	print "Invalid JSON"
+        	        	logger.info("Invalid JSON")
 
 
 			pass 
  
 	except (IndexError):
-		print "No data received within serial timeout period"
+		logger.debug("No data received within serial timeout period")
 		cleanup()
 	except (KeyboardInterrupt):
-		print "Interrupt received"
+		logger.debug("Interrupt received")
 		cleanup()
 	except (RuntimeError):
-		print "uh-oh! time to die"
+		logger.debug("uh-oh! time to die")
 		cleanup()

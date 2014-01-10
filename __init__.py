@@ -18,9 +18,12 @@ import input_to_mqtt
 import output_to_433mhz
 from multiprocessing import Process
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 def signal_handler(signal, frame):
-        print "Got CTL+C"
+        logger.info("Got CTL+C")
         time.sleep(1)
         for job in jobs:
                 job.terminate()
@@ -29,6 +32,7 @@ def signal_handler(signal, frame):
 
 def main():
 	try:
+		logger.info("Starting...")
 		jobs = []
                 p = Process(target=input_to_mqtt.main)
                 p2 = Process(target=output_to_433mhz.main)
