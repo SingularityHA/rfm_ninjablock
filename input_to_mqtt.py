@@ -20,11 +20,15 @@ import os
 import time
 import calendar
 import json
-import codes
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)) + "/../lib")
 from config import config
 import logging
+
+codes = json.loads(open(os.path.dirname(os.path.realpath(__file__)) + "/codes.json", "r").read())
+
+rfm_actuators = codes['rfm_actuators']
+rfm_sensors = codes['rfm_sensors']
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +106,7 @@ def main():
                 		try:
 					device_id[data['DEVICE'][0]['D']]()
         	        		if data['DEVICE'][0]['D'] == 11:
-						result = codes.rfm_sensors[hex(int(data['DEVICE'][0]['DA'],2))]
+						result = rfm_sensors[hex(int(data['DEVICE'][0]['DA'],2))]
 						json_data = json.dumps([result]) 
 						if gap < 10:
 							if line == lastline:

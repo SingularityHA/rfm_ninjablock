@@ -16,7 +16,6 @@
 
 import mosquitto
 import serial
-from codes import rfm_actuators
 import os
 import sys
 import time
@@ -26,6 +25,11 @@ import state
 import logging
 
 logger = logging.getLogger(__name__)
+
+codes = json.loads(open(os.path.dirname(os.path.realpath(__file__)) + "/codes.json", "r").read())
+
+rfm_actuators = codes['rfm_actuators']
+rfm_sensors = codes['rfm_sensors']
 
 serialdev = str(config.get("rfm_ninjablock", "serialdev"))
 broker = str(config.get("mqtt", "host"))
