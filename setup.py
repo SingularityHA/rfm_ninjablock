@@ -42,7 +42,7 @@ r = json.loads(requests.get("http://" + config.get("general", "confighost") + "/
 for obj in r['objects']:
     attrib = []
     attrib = ast.literal_eval(obj['attributes'])
-    picker[str(attrib['type']) + "_" + str(attrib['device'])](str(obj['name']), str(attrib['code']))
+    picker[str(obj['type']) + "_" + str(attrib['device'])](str(obj['name']), str(attrib['code']))
 
 codes = {'rfm_actuators': rfm_actuators, 'rfm_sensors': rfm_sensors}
 
