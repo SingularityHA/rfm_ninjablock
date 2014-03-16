@@ -31,7 +31,8 @@ def single_state_sensor(name, code):
 
 picker = {
     "actuator_switch": actuator_switch,
-    "sensor_magnetic": single_state_sensor
+    "sensor_magnetic": single_state_sensor,
+    "sensor_button": single_state_sensor,
 }
 
 idFile = open(os.path.dirname(os.path.realpath(__file__)) + "/id.txt", "r").read()
@@ -42,7 +43,10 @@ r = json.loads(requests.get("http://" + config.get("general", "confighost") + "/
 for obj in r['objects']:
     attrib = []
     attrib = ast.literal_eval(obj['attributes'])
-    picker[str(obj['type']) + "_" + str(attrib['device'])](str(obj['name']), str(attrib['code']))
+    if str(obj['type']) == "sensor":
+        picker[str(obj['type']) + "_" + str(attrib['device'])](str(attrib['code']),str(obj['name']))
+    else:
+	picker[str(obj['type']) + "_" + str(attrib['device'])](str(obj['name']), str(attrib['code']))
 
 codes = {'rfm_actuators': rfm_actuators, 'rfm_sensors': rfm_sensors}
 

@@ -95,6 +95,7 @@ def main():
         lastpublish = 0
 
         while mqttc.loop() == 0:
+	    time.sleep(0.01)
             line = ser.readline()
             gap = calendar.timegm(time.gmtime()) - lastpublish
             try:
@@ -103,7 +104,10 @@ def main():
                 try:
                     device_id[data['DEVICE'][0]['D']]()
                     if data['DEVICE'][0]['D'] == 11:
+			logger.debug("sensor hex " + str(hex(int(data['DEVICE'][0]['DA'], 2))))
                         result = rfm_sensors[hex(int(data['DEVICE'][0]['DA'], 2))]
+			logger.debug(rfm_sensors)
+			logger.debug(result)
                         json_data = json.dumps([result])
                         if gap < 10:
                             if line == lastline:
