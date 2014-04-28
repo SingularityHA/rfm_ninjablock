@@ -54,13 +54,6 @@ device_id = {11: rfm,
 }
 
 
-def on_connect(rc):
-    if rc == 0:
-        logger.info("433mhz -> MQTT Connected")
-    else:
-        raise Exception
-
-
 def on_publish(val):
     logger.debug("Published 433mhz")
 
@@ -87,7 +80,6 @@ def main():
         client = "singularity_rfmNB_input"
         mqttc = mosquitto.Mosquitto(client)
 
-        mqttc.on_connect = on_connect
         mqttc.on_publish = on_publish
         mqttc.connect(broker, port, 60, True)
 

@@ -37,10 +37,6 @@ def hextobin(hexval):
     return binval
 
 
-def on_connect(rc):
-    logger.info("Connected MQTT -> 433mhz")
-
-
 def on_message(msg):
     payload = rfm_actuators[msg.payload]
     payload_split = payload.split("_")
@@ -57,7 +53,6 @@ def main():
         mqttc = mosquitto.Mosquitto("singularity_rfmNB_output")
 
         mqttc.on_message = on_message
-        mqttc.on_connect = on_connect
 
         mqttc.connect(broker, port, 60, True)
 
